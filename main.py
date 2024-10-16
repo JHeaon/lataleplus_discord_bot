@@ -1,11 +1,12 @@
 import os
+import log.logger
 
 from apscheduler.schedulers.background import BackgroundScheduler
-
 from crawl.crawler import Crawler
 from handle.handler import Handler
 from notify.discord_notifier import DiscordNotifier
 from observer.monitor import Monitor
+
 
 if __name__ == "__main__":
 
@@ -32,14 +33,14 @@ if __name__ == "__main__":
 
                     Monitor(Crawler(os.environ.get("FREE_BULLET_IN_BOARD")),
                             Handler(os.environ.get("DB"), "FreeBulletinBoard"),
-                            DiscordNotifier(os.environ.get("DISCORD_FREE_BULLET_IN_BOARD"))),
+                            DiscordNotifier(os.environ.get("DISCORD_FREE_BULLET_IN_BOARD_API"))),
 
                     ]
 
     scheduler = BackgroundScheduler(timezone='Asia/Seoul')
 
     for monitor in monitor_list:
-        scheduler.add_job(monitor.run, "interval", seconds=30)
+        scheduler.add_job(monitor.run, "interval", seconds=3)
 
     scheduler.start()
 

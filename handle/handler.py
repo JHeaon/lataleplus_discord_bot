@@ -23,8 +23,6 @@ class Handler(ABC):
         con.commit()
         con.close()
 
-        print("데이터 저장 완료")
-
     def compare_from_db(self, data_list: list[Data]) -> list[Data]:
         new_data = []
 
@@ -42,8 +40,6 @@ class Handler(ABC):
 
             else:
                 break
-
-        print("추가된 데이터 : ", new_data)
 
         return new_data
 

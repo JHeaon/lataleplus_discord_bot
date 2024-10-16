@@ -2,7 +2,7 @@ import requests
 import json
 import os
 from dotenv import load_dotenv
-from .notifier import Notifier
+from notify.notifier import Notifier
 
 load_dotenv()
 
@@ -31,4 +31,16 @@ class DiscordNotifier(Notifier):
             }
 
             requests.post(discord_api, headers=headers, data=json.dumps(json_data))
-            print("디스코드 발송 완료")
+
+    def send_message(self, message):
+        discord_api = self.url
+
+        headers = {
+            "Content-Type": "application/json"
+        }
+
+        json_data = {
+            'content': message
+        }
+
+        requests.post(discord_api, headers=headers, data=json.dumps(json_data))
