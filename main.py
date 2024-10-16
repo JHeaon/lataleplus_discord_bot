@@ -43,7 +43,7 @@ if __name__ == "__main__":
     scheduler = BackgroundScheduler(timezone='Asia/Seoul')
 
     for monitor in monitor_list:
-        scheduler.add_job(monitor.run, "interval", minutes=1)
+        scheduler.add_job(monitor.run, "interval", seconds=30)
 
     scheduler.start()
 
