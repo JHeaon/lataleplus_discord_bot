@@ -15,8 +15,8 @@ if __name__ == "__main__":
 
     monitor_list = [
         Monitor(Crawler(os.environ.get("ANNOUNCEMENT_API")),
-                 Handler(os.environ.get("DB"), "Announcement"),
-                 DiscordNotifier(os.environ.get("DISCORD_ANNOUNCEMENT_API"))),
+                Handler(os.environ.get("DB"), "Announcement"),
+                DiscordNotifier(os.environ.get("DISCORD_ANNOUNCEMENT_API"))),
 
         Monitor(Crawler(os.environ.get("INSPECTION_UPDATE_API")),
                 Handler(os.environ.get("DB"), "InspectionUpdate"),
@@ -43,7 +43,7 @@ if __name__ == "__main__":
     scheduler = BackgroundScheduler(timezone='Asia/Seoul')
 
     for monitor in monitor_list:
-        scheduler.add_job(monitor.run, "interval", seconds=30)
+        scheduler.add_job(monitor.run, "interval", seconds=10)
 
     scheduler.start()
 

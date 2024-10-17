@@ -24,22 +24,19 @@ class Handler(ABC):
         con.close()
 
     def compare_from_db(self, data_list: list[Data]) -> list[Data]:
-        new_data = []
 
         con, cur = self.db_connect()
-        data = cur.execute(f"SELECT * FROM {self.__db_table_name} ORDER BY id DESC LIMIT 1").fetchall()
 
-        if data:
-            db_first_post_title = data[0][1]
+        # 한번 크롤링 하면 25개의 데이터만 가져옴
+        # db에서 25개의 데이터와 현재 받은 데이터를 비교하여 새로 올라온 게시글을 필터링 처리함
+
+        db_data_list = cur.execute(f"SELECT * FROM {self.__db_table_name} ORDER BY id DESC LIMIT 25").fetchall()
+        if db_data_list:
+            db_data_list = [Data(data[1], data[2], data[3]) for data in db_data_list]
         else:
-            db_first_post_title = None
+            return data_list
 
-        for data in data_list:
-            if data.title != db_first_post_title:
-                new_data.append(data)
-
-            else:
-                break
+        new_data = list(filter(lambda data: (data.title not in [db_data.title for db_data in db_data_list]), data_list))
 
         return new_data
 
