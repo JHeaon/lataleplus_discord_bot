@@ -34,9 +34,11 @@ class Handler(ABC):
         if db_data_list:
             db_data_list = [Data(data[1], data[2], data[3]) for data in db_data_list]
         else:
+            con.close()
             return data_list
 
         new_data = list(filter(lambda data: (data.title not in [db_data.title for db_data in db_data_list]), data_list))
+        con.close()
 
         return new_data
 
