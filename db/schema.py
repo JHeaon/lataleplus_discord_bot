@@ -4,7 +4,7 @@ from sqlalchemy import Column, Integer, String, create_engine, text, select
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 # db 연결을 위한 engine
-engine = create_engine(f"postgresql:///{os.environ.get("DB")}")
+engine = create_engine(f"postgresql://root:password@localhost:5432/postgres")
 
 # 모델 생성을 위한 세팅
 Base = declarative_base()
