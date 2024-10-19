@@ -11,6 +11,7 @@ beautifulsoup4 = "*"
 selenium = "*"
 python-dotenv = "*"
 sqlalchemy = "*"
+psycopg2 = "*"
 
 [dev-packages]
 
