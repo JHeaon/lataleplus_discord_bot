@@ -1,56 +1,40 @@
-from abc import ABC, abstractmethod
-import sqlite3
+from abc import ABC
+from db import schema
 from entity.data import Data
+from sqlalchemy.orm import Session
 
 
 class Handler(ABC):
-
-    def __init__(self, file_address, db_table_name):
-        self.__file_address = file_address
-        self.__db_table_name = db_table_name
+    def __init__(self, class_name: str):
+        self.class_name = class_name
 
     def save(self, data_list: list[Data]):
 
-        if not data_list:
-            return
+        with schema.get_session()() as db:
+            # 데이터 베이스에는 역순으로 저장되어야 함.
+            for data in data_list[::-1]:
+                obj = getattr(schema, self.class_name)(title=data.title, contents=data.contents, url=data.url)
+                db.add(obj)
 
-        con, cur = self.db_connect()
-
-        for event_data in data_list[::-1]:
-            cur.execute(f"INSERT INTO {self.__db_table_name} (title, contents, url) VALUES (?, ?, ?)",
-                        (event_data.title, event_data.contents, event_data.url))
-
-        con.commit()
-        con.close()
+            db.commit()
 
     def compare_from_db(self, data_list: list[Data]) -> list[Data]:
+        session = schema.get_session()
 
-        con, cur = self.db_connect()
+        # 최신 데이터 25개를 가져온다.
+        with schema.get_session()() as db:
+            obj = getattr(schema, self.class_name)
+            db_data_list = db.query(obj).order_by(obj.id.desc()).limit(25).all()
 
-        # 한번 크롤링 하면 25개의 데이터만 가져옴
-        # db에서 25개의 데이터와 현재 받은 데이터를 비교하여 새로 올라온 게시글을 필터링 처리함
+        new_data = []
+        db_titles = [db_data.title for db_data in db_data_list]
 
-        db_data_list = cur.execute(f"SELECT * FROM {self.__db_table_name} ORDER BY id DESC LIMIT 25").fetchall()
-        if db_data_list:
-            db_data_list = [Data(data[1], data[2], data[3]) for data in db_data_list]
-        else:
-            con.close()
-            return data_list
+        if db_data_list is None:
+            new_data = data_list
+            return new_data
 
-        new_data = list(filter(lambda data: (data.title not in [db_data.title for db_data in db_data_list]), data_list))
-        con.close()
+        for crawling_data in data_list:
+            if crawling_data.title not in db_titles:
+                new_data.append(crawling_data)
 
         return new_data
-
-    def db_connect(self):
-        con = sqlite3.connect(f'{self.file_address}')
-        cur = con.cursor()
-        return con, cur
-
-    @property
-    def file_address(self):
-        return self.__file_address
-
-    @file_address.setter
-    def file_address(self, new_file_address):
-        self.__file_address = new_file_address
