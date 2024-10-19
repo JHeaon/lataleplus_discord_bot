@@ -12,10 +12,7 @@ class Monitor():
 
     def run(self):
         crawling_data = self.crawler.run()
-        print(f"crawling data : ", crawling_data)
-
         new_data = self.handler.compare_from_db(crawling_data)
-        print(f"new data: ", new_data)
 
         if new_data:
             self.handler.save(new_data)
