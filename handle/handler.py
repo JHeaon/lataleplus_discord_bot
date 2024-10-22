@@ -24,7 +24,7 @@ class Handler(ABC):
         # 최신 데이터 25개를 가져온다.
         with schema.get_session()() as db:
             obj = getattr(schema, self.class_name)
-            db_data_list = db.query(obj).order_by(obj.id.desc()).limit(25).all()
+            db_data_list = db.query(obj).order_by(obj.id.desc()).limit(50).all()
 
         new_data = []
         db_titles = [db_data.title for db_data in db_data_list]
